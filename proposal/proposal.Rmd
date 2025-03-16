@@ -1,23 +1,46 @@
 ---
 title: "Project proposal"
-author: "Your name"
+author: "Caeden Kullander"
 output: github_document
 ---
 
-```{r load-packages, message = FALSE}
+```{r load-packages, message = FALSE, echo=FALSE}
 library(tidyverse)
 library(broom)
 ```
 
+
+***Dear Professor Sullivan, I could not get the read.csv to work in this file. However, it worked fine in a different file that I was testing in. It is an Rmd file named "Project". Couldn't see any difference between the two, and I wanted to include something that was functional.***
+
+
 ## 1. Introduction
+pizza_barstool is a dataset about pizza places and their reviews. I found it on TidyTuesday. It pulls data from the “One Bite” app. This data includes review information from critics and the public, as well as location and price rating information.
+I want to explore the relationships between location, price ratings, community reviews, critic reviews, and number of reviews and how these are correlated with each other. 
+Specifically, I want to know how much community reviews differ from critic reviews, and how location and price impact these correlations.
+
+
 
 
 
 ## 2. Data
 
+```{r echo=FALSE}
+pizza <- read.csv(file = "data/pizza_barstool.csv")
+```
+
+```{r echo=FALSE}
+library(dplyr)
+glimpse(pizza)
+```
+
 
 
 ## 3. Data analysis plan
+
+
+
+
+
 
 
 

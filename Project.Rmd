@@ -2,48 +2,63 @@
 title: "Project"
 author: "Caeden Kullander"
 date: "2025-03-16"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-## Introduction
+## 1. Introduction
 
 pizza_barstool is a dataset about pizza places and their reviews. I found it on TidyTuesday. It pulls data from the “One Bite” app. This data includes review information from critics and the public, as well as location and price rating information.
 I want to explore the relationships between location, price ratings, community reviews, critic reviews, and number of reviews and how these are correlated with each other. 
+Specifically, I want to know how much community reviews differ from critic reviews, and how location and price impact these correlations.
 
+## 2. Data
 
-
-
-```{r}
+```{r echo=FALSE}
 pizza <- read.csv(file = "data/pizza_barstool.csv")
 ```
 
 
-```{r}
+```{r echo=FALSE}
+library(dplyr)
 glimpse(pizza)
 ```
 
-Question: Does the number of reviews corelate with the average review score?
+## 3. Data analysis plan
 
-```{r}
+To answer my questions, I plan to use the variables for average scores for critics and community. I plan to compare visualisations between the two, and also filter/mutate for specific geographical areas to see how ratings compare in various locations.
+
+Does the number of reviews correlate with the average review score?
+
+```{r echo=FALSE}
 library(ggplot2)
 ggplot(data=pizza, mapping=aes(x = review_stats_community_average_score, y = review_stats_community_count)) +
   geom_point() +
   labs(x="Average Community Rating", y="Total Community Reviews")
 ```
 
-There is certainly some correlation there, but this display shows that many of the restauants have very few reviews.
+There is certainly some correlation there, but this display shows that many of the restaurants have very few reviews.
 
 
+How does price level correlate with community ratings and critic ratings? How are the correlations different?
+```{r echo=FALSE}
 
+ggplot(data=pizza, mapping=aes(y = review_stats_community_average_score, x = price_level)) +
+  geom_point() +
+  labs(y="Average Community Rating", x="Price rating")
+```
 
+```{r echo=FALSE}
 
+ggplot(data=pizza, mapping=aes(y = review_stats_critic_average_score, x = price_level)) +
+  geom_point() +
+  labs(y="Average Critic Rating", x="Price rating")
+```
 
-
-
+The two are surprisingly similar, with very little notable difference.
 
 
 

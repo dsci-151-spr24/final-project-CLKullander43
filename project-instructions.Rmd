@@ -3,11 +3,11 @@ title: "Project"
 output: pdf_document
 ---
 
-
-
 ## TL;DR
 
 Pick a dataset, any dataset...
+
+
 
 ...and do something with it.
 That is your final project in a nutshell.
