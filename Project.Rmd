@@ -1,8 +1,10 @@
 ---
-title: "Project"
+title: "Pizza"
 author: "Caeden Kullander"
 date: "2025-03-16"
-output: github_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -17,12 +19,12 @@ Specifically, I want to know how much community reviews differ from critic revie
 
 ## 2. Data
 
-```{r echo=FALSE}
+```{r echo=FALSE, message=FALSE}
 pizza <- read.csv(file = "data/pizza_barstool.csv")
 ```
 
 
-```{r echo=FALSE}
+```{r echo=FALSE, message=FALSE}
 library(dplyr)
 glimpse(pizza)
 ```
@@ -59,6 +61,41 @@ ggplot(data=pizza, mapping=aes(y = review_stats_critic_average_score, x = price_
 ```
 
 The two are surprisingly similar, with very little notable difference.
+
+
+
+
+
+
+
+**Now I want to analyze the difference in ratings depending on whether a restaurant is in New York or not.**
+
+```{r nyc}
+pizza <- pizza %>%
+  mutate("nyc" = ifelse(city=="New York" | city=="New York City", "yes", "no"))
+```
+
+```{r}
+ggplot(data=pizza, mapping=aes(x = review_stats_all_average_score, fill = nyc)) +
+  geom_histogram() +
+  facet_wrap(nyc~.) +
+  labs(y="Average Community Rating", x="Price rating")
+```
+
+**The two are still quite similar aside from NYC having larger spikes and more observations in total.**
+
+
+
+Now I want to see how number of reviews is correlated with review score. I expect that with more reviews, there will be a higher average, as people often tend to cluster towards high quality restaurants, but I may be surprised.
+
+```{r warning=FALSE}
+ggplot(data=pizza, mapping=aes(y = review_stats_community_average_score, x = review_stats_community_count, alpha=0.5)) +
+  geom_jitter() +
+  xlim(0, 250) +
+  labs(y="Community Average Rating", x="Community Review Count")
+```
+
+**While there is a large cluster of high ratings where there are few reviews, whenever there is a high number of reviews the ratings are also high. I'm curious about this correltaion, so let's make a model for it.**
 
 
 
