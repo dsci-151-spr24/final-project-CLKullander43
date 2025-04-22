@@ -26,6 +26,9 @@ pizza <- read.csv(file = "data/pizza_barstool.csv")
 
 ```{r echo=FALSE, message=FALSE}
 library(dplyr)
+library(ggplot2)
+library(tidyverse)
+library(tidymodels)
 glimpse(pizza)
 ```
 
@@ -75,7 +78,7 @@ pizza <- pizza %>%
   mutate("nyc" = ifelse(city=="New York" | city=="New York City", "yes", "no"))
 ```
 
-```{r}
+```{r message=FALSE}
 ggplot(data=pizza, mapping=aes(x = review_stats_all_average_score, fill = nyc)) +
   geom_histogram() +
   facet_wrap(nyc~.) +
@@ -97,6 +100,14 @@ ggplot(data=pizza, mapping=aes(y = review_stats_community_average_score, x = rev
 
 **While there is a large cluster of high ratings where there are few reviews, whenever there is a high number of reviews the ratings are also high. I'm curious about this correltaion, so let's make a model for it.**
 
+
+```{r}
+linear_reg() %>%
+  set_engine("glm") %>%
+  fit(review_stats_community_average_score ~ review_stats_community_count, data = pizza) %>%
+  tidy()
+```
+**Starting at 6.15, for every review, the community average rating is expected to be 0.017 higher.
 
 
 
