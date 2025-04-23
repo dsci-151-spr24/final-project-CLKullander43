@@ -22,6 +22,7 @@ library(tidymodels)
 library(palmerpenguins)
 library(knitr)
 library(xaringanthemer)
+library(ggplot2)
 ```
 
 ```{r setup, include=FALSE}
@@ -30,8 +31,85 @@ knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618,
 ```
 
 ```{r load-data, include=FALSE}
-# Load your data here
+pizza <- read_csv(file = "pizza_barstool.csv")
 ```
+
+```{r nyc}
+pizza <- pizza %>%
+  mutate("nyc" = ifelse(city=="New York" | city=="New York City", "Yes", "No"))
+```
+
+---
+#Pizza
+The goal is to figure out pizza ratings, what impacts them, and how to predict them so we can choose the best pizza restaurants.
+
+---
+
+class: inverse, center, middle
+
+# What wasn't helpful
+
+---
+#Price rating with Community Rating
+```{r echo=FALSE}
+ggplot(data=pizza, mapping=aes(y = review_stats_community_average_score, x = price_level, alpha = 0.2)) +
+  geom_point(color="blue") +
+  labs(y="Average Community Rating", x="Price rating")
+
+```
+---
+#Price rating with Critic Rating
+```{r echo=FALSE}
+ggplot(data=pizza, mapping=aes(y = review_stats_critic_average_score, x = price_level)) +
+  geom_point(color="red") +
+  labs(y="Average Critic Rating", x="Price rating")
+```
+
+---
+#There aren't many Critic Ratings
+
+let's take a look at what the issue may be.
+
+--
+```{r}
+pizza %>%
+  count(review_stats_critic_count)
+```
+--
+Oh dear. There are barely any critic ratings.
+
+---
+#Are there other similar issues in our dataset? Are the community ratings as bad?
+--
+```{r echo=FALSE}
+pizza %>%
+  count(review_stats_community_count)
+```
+looks like we'll be okay. However, we will go ahead and remove all of observations without any community reviews.
+```{r echo=FALSE}
+pizza <- pizza %>%
+  mutate("review_stats_community_count" = case_when(review_stats_community_count != 0 ~ review_stats_community_count)) %>%
+  drop_na()
+```
+
+---
+#Let's try geographical!
+New York is known for pizza, let's see how it's ratings compare to elsewhere.
+
+```{r message=FALSE, echo=FALSE}
+ggplot(data=pizza, mapping=aes(x = review_stats_all_average_score, fill = nyc)) +
+  geom_histogram() +
+  facet_wrap(nyc~.) +
+  labs(title = "New York City Pizza Ratings", y="Average Community Rating", x="Price rating")
+```
+
+
+
+---
+#THIS IS THE END OF WHERE I"VE GOTTEN TO. THE REST IS WHAT WAS ALREADY IN THE FILE!!!
+
+
+---
 
 ```{r}
 style_xaringan(
