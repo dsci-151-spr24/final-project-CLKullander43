@@ -51,7 +51,7 @@ There is certainly some correlation there, but this display shows that many of t
 How does price level correlate with community ratings and critic ratings? How are the correlations different?
 ```{r echo=FALSE}
 
-ggplot(data=pizza, mapping=aes(y = review_stats_community_average_score, x = price_level)) +
+ggplot(data=pizza, mapping=aes(y = review_stats_community_average_score, x = price_level, alpha = 0.2)) +
   geom_point() +
   labs(y="Average Community Rating", x="Price rating")
 ```
@@ -108,6 +108,17 @@ linear_reg() %>%
   tidy()
 ```
 **Starting at 6.15, for every review, the community average rating is expected to be 0.017 higher.
+
+
+
+```{r zero_filter}
+pizza <- pizza %>%
+  mutate("review_stats_community_count" = case_when(review_stats_community_count != 0 ~ review_stats_community_count)) %>%
+  drop_na()
+
+pizza %>%
+  count(review_stats_community_count)
+```
 
 
 
