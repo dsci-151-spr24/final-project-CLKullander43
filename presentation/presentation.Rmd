@@ -1,7 +1,7 @@
 ---
-title: "Presentation title"
+title: "Pizza"
 subtitle: "Presentation subtitle (if any)"
-author: "Your Name"
+author: "Caeden Kullander"
 institute: "Houghton University"
 date: "`r Sys.Date()`"
 output:
@@ -28,6 +28,12 @@ library(ggplot2)
 ```{r setup, include=FALSE}
 # For better figure resolution
 knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618, out.width = "80%")
+```
+
+```{r}
+style_xaringan(
+  title_slide_background_image = "img/Pizza.JPEG"
+)
 ```
 
 ```{r load-data, include=FALSE}
@@ -75,7 +81,6 @@ let's take a look at what the issue may be.
 pizza %>%
   count(review_stats_critic_count)
 ```
---
 Oh dear. There are barely any critic ratings.
 
 ---
@@ -85,7 +90,7 @@ Oh dear. There are barely any critic ratings.
 pizza %>%
   count(review_stats_community_count)
 ```
-looks like we'll be okay. However, we will go ahead and remove all of observations without any community reviews.
+Looks like we'll be okay. However, we will go ahead and remove all of observations without any community reviews.
 ```{r echo=FALSE}
 pizza <- pizza %>%
   mutate("review_stats_community_count" = case_when(review_stats_community_count != 0 ~ review_stats_community_count)) %>%
@@ -93,7 +98,7 @@ pizza <- pizza %>%
 ```
 
 ---
-#Let's try geographical!
+#Let's try Geographical!
 New York is known for pizza, let's see how it's ratings compare to elsewhere.
 
 ```{r message=FALSE, echo=FALSE}
@@ -106,16 +111,27 @@ ggplot(data=pizza, mapping=aes(x = review_stats_all_average_score, fill = nyc)) 
 
 
 ---
+#What kinda worked
+**how does the number of views affect the average review rating?**
+
+---
+```{r warning=FALSE, echo=FALSE}
+ggplot(data=pizza, mapping=aes(y = review_stats_community_average_score, x = review_stats_community_count, alpha=0.5)) +
+  geom_jitter() +
+  xlim(0, 250) +
+  labs(title="Community Reviews", y="Average Rating", x="Review Count")
+```
+
+
+
+---
+
 #THIS IS THE END OF WHERE I"VE GOTTEN TO. THE REST IS WHAT WAS ALREADY IN THE FILE!!!
 
 
 ---
 
-```{r}
-style_xaringan(
-  title_slide_background_image = "img/confetti.jpg"
-)
-```
+
 
 
 class: center, middle
