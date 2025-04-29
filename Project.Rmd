@@ -67,7 +67,14 @@ The two are surprisingly similar, with very little notable difference.
 
 
 
+```{r zero_filter}
+pizza <- pizza %>%
+  mutate("review_stats_community_count" = case_when(review_stats_community_count != 0 ~ review_stats_community_count)) %>%
+  drop_na()
 
+pizza %>%
+  count(review_stats_community_count)
+```
 
 
 
@@ -95,6 +102,7 @@ Now I want to see how number of reviews is correlated with review score. I expec
 ggplot(data=pizza, mapping=aes(y = review_stats_community_average_score, x = review_stats_community_count, alpha=0.5)) +
   geom_jitter() +
   xlim(0, 250) +
+  geom_smooth()
   labs(y="Community Average Rating", x="Community Review Count")
 ```
 
@@ -107,19 +115,75 @@ linear_reg() %>%
   fit(review_stats_community_average_score ~ review_stats_community_count, data = pizza) %>%
   tidy()
 ```
-**Starting at 6.15, for every review, the community average rating is expected to be 0.017 higher.
+**Starting at 6.89 for every review, the community average rating is expected to be 0.01 higher.**
 
 
 
-```{r zero_filter}
-pizza <- pizza %>%
-  mutate("review_stats_community_count" = case_when(review_stats_community_count != 0 ~ review_stats_community_count)) %>%
-  drop_na()
+I want to now do the same visualisation and model, but this time filter out the observations with only a very small number of reviews. First, I'll filter out anything with less than five reviews and see where that gets me. 
 
-pizza %>%
-  count(review_stats_community_count)
+
+```{r filtered_pizza}
+filtered_pizza <- pizza %>%
+  filter(review_stats_community_count >= 5)
+
 ```
 
 
+```{r warning=FALSE}
+ggplot(data=filtered_pizza, mapping=aes(y = review_stats_community_average_score, x = review_stats_community_count, alpha=0.5)) +
+  geom_jitter() +
+  xlim(0, 250) +
+  geom_smooth()
+  labs(y="Community Average Rating", x="Community Review Count")
+```
+
+```{r}
+linear_reg() %>%
+  set_engine("glm") %>%
+  fit(review_stats_community_average_score ~ review_stats_community_count, data = filtered_pizza) %>%
+  tidy()
+```
+
+This is interesting. It raised the intercept but reduced the slope. Looking at the data, it seems that it plateaus after around 50 reviews. Let's try filtering for only data with 5-50 reviews.
+
+```{r}
+few_pizza <- filtered_pizza %>%
+  filter(review_stats_community_count <= 50)
+```
+
+
+```{r warning=FALSE}
+ggplot(data=few_pizza, mapping=aes(y = review_stats_community_average_score, x = review_stats_community_count, alpha=0.5)) +
+  geom_jitter() +
+  geom_smooth()
+  labs(y="Community Average Rating", x="Community Review Count")
+```
+
+
+
+```{r}
+linear_reg() %>%
+  set_engine("glm") %>%
+  fit(review_stats_community_average_score ~ review_stats_community_count, data = few_pizza) %>%
+  tidy()
+```
+
+This lowered the intercept but raised the slope. It might be slightly more helpful, but through all of this I'm seeing that it makes sense to simply eat at the restaurants with a high number of reviews, as they all tend to have good ratings. While a restaurant with a moderate number of reviews have a chance of being good, the restaurants with massive numbers are consistently rated highly. Basically, go straight to where it plateaus, becuase there is no reason not to. Then again, maybe there could be some reason not to. Perhaps these restaurants are more expensive. Let's check.
+
+
+```{r}
+many_pizza <- pizza %>%
+  filter(review_stats_community_count >= 50)
+```
+
+
+```{r echo=FALSE}
+
+ggplot(data=many_pizza, mapping=aes(y = review_stats_community_average_score, x = price_level, alpha = 0.2)) +
+  geom_point() +
+  labs(y="Average Community Rating", x="Price Level")
+```
+
+Nope, none of these go above 2. This means that we want a restaurant with a price level of 2, and a large number of reviews. 
 
 
