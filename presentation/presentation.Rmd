@@ -30,7 +30,7 @@ library(ggplot2)
 knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618, out.width = "80%")
 ```
 
-```{r}
+```{r include=FALSE}
 style_xaringan(
   title_slide_background_image = "img/Pizza.JPEG"
 )
@@ -40,27 +40,37 @@ style_xaringan(
 pizza <- read_csv(file = "pizza_barstool.csv")
 ```
 
-```{r nyc}
+```{r nyc, include=FALSE}
 pizza <- pizza %>%
-  mutate("nyc" = ifelse(city=="New York" | city=="New York City", "Yes", "No"))
+  mutate("nyc" = ifelse(city=="New York" | city=="New York City", "nyc", "not nyc"))
 ```
 
----
 #Pizza
 The goal is to figure out pizza ratings, what impacts them, and how to predict them so we can choose the best pizza restaurants.
 
 ---
+#Let's try Geographical!
 
-class: inverse, center, middle
-
-# What wasn't helpful
+--
+```{r message=FALSE, echo=FALSE}
+ggplot(data=pizza, mapping=aes(x = review_stats_all_average_score, fill = nyc)) +
+  geom_histogram() +
+  facet_wrap(nyc~.) +
+  labs(title = "New York City Pizza Ratings", x="Average Community Rating")
+```
+---
+```{r echo=FALSE}
+pizza %>%
+  group_by(nyc) %>%
+  summarise(med_rating =median(review_stats_community_average_score), mean_rating =mean(review_stats_community_average_score))
+```
 
 ---
 #Price rating with Community Rating
 ```{r echo=FALSE}
 ggplot(data=pizza, mapping=aes(y = review_stats_community_average_score, x = price_level, alpha = 0.2)) +
   geom_point(color="blue") +
-  labs(y="Average Community Rating", x="Price rating")
+  labs(y="Average Community Rating", x="Price level")
 
 ```
 ---
@@ -68,7 +78,7 @@ ggplot(data=pizza, mapping=aes(y = review_stats_community_average_score, x = pri
 ```{r echo=FALSE}
 ggplot(data=pizza, mapping=aes(y = review_stats_critic_average_score, x = price_level)) +
   geom_point(color="red") +
-  labs(y="Average Critic Rating", x="Price rating")
+  labs(y="Average Critic Rating", x="Price level")
 ```
 
 ---
@@ -98,19 +108,6 @@ pizza <- pizza %>%
 ```
 
 ---
-#Let's try Geographical!
-New York is known for pizza, let's see how it's ratings compare to elsewhere.
-
-```{r message=FALSE, echo=FALSE}
-ggplot(data=pizza, mapping=aes(x = review_stats_all_average_score, fill = nyc)) +
-  geom_histogram() +
-  facet_wrap(nyc~.) +
-  labs(title = "New York City Pizza Ratings", y="Average Community Rating", x="Price rating")
-```
-
-
-
----
 #What kinda worked
 **how does the number of views affect the average review rating?**
 
@@ -123,9 +120,21 @@ ggplot(data=pizza, mapping=aes(y = review_stats_community_average_score, x = rev
 ```
 
 
+---
+#Let's make a model
+```{r echo=FALSE}
+linear_reg() %>%
+  set_engine("glm") %>%
+  fit(review_stats_community_average_score ~ review_stats_community_count, data = pizza) %>%
+  tidy()
+```
 
 ---
+Slighly better model
 
+---
+Conclusion
+---
 #THIS IS THE END OF WHERE I"VE GOTTEN TO. THE REST IS WHAT WAS ALREADY IN THE FILE!!!
 
 
