@@ -1,6 +1,5 @@
 ---
 title: "Pizza"
-subtitle: "Presentation subtitle (if any)"
 author: "Caeden Kullander"
 institute: "Houghton University"
 date: "`r Sys.Date()`"
@@ -32,7 +31,7 @@ knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618,
 
 ```{r include=FALSE}
 style_xaringan(
-  title_slide_background_image = "img/Pizza.JPEG"
+  title_slide_background_image = "img/Pizza.JPEG", title_slide_text_color = "black"
 )
 ```
 
@@ -46,27 +45,40 @@ pizza <- pizza %>%
 ```
 
 #Pizza
-The goal is to figure out pizza ratings, what impacts them, and how to predict them so we can choose the best pizza restaurants.
+- The goal is to figure out what impacts pizza ratings so we can find the best restaurants.
+
+- Motivation? College students everywhere need pizza, and they need to know how to find the best pizza.
+
+- I found this data from Tidy Tuesday. It pulls from the "One Bite" pizza ratings app.
 
 ---
 #Let's try Geographical!
-
 --
-```{r message=FALSE, echo=FALSE}
+
+.right-column[
+
+
+NYC sucks!
+```{r echo=FALSE, message=FALSE}
 ggplot(data=pizza, mapping=aes(x = review_stats_all_average_score, fill = nyc)) +
+  guides(fill="none") +
   geom_histogram() +
   facet_wrap(nyc~.) +
-  labs(title = "New York City Pizza Ratings", x="Average Community Rating")
+  labs(title = "New York City Pizza Ratings", x="Average Community Rating", legend = FALSE)
 ```
----
+]
+.left-column[
 ```{r echo=FALSE}
 pizza %>%
   group_by(nyc) %>%
   summarise(med_rating =median(review_stats_community_average_score), mean_rating =mean(review_stats_community_average_score))
 ```
 
+
+**New York does slightly worse on average.**
+]
 ---
-#Price rating with Community Rating
+#Price level with Community Rating
 ```{r echo=FALSE}
 ggplot(data=pizza, mapping=aes(y = review_stats_community_average_score, x = price_level, alpha = 0.2)) +
   geom_point(color="blue") +
@@ -87,14 +99,14 @@ ggplot(data=pizza, mapping=aes(y = review_stats_critic_average_score, x = price_
 let's take a look at what the issue may be.
 
 --
-```{r}
+```{r echo=FALSE}
 pizza %>%
   count(review_stats_critic_count)
 ```
-Oh dear. There are barely any critic ratings.
+**Oh dear! We don't have enough critic ratings.**
 
 ---
-#Are there other similar issues in our dataset? Are the community ratings as bad?
+#Do we have the same issue with community ratings?
 --
 ```{r echo=FALSE}
 pizza %>%
@@ -108,14 +120,14 @@ pizza <- pizza %>%
 ```
 
 ---
-#What kinda worked
-**how does the number of views affect the average review rating?**
+##How does the total number of reviews affect the average review rating?
 
----
-```{r warning=FALSE, echo=FALSE}
+--
+```{r echo=FALSE, fig.height=3, fig.width=4.4, message=FALSE, warning=FALSE}
 ggplot(data=pizza, mapping=aes(y = review_stats_community_average_score, x = review_stats_community_count, alpha=0.5)) +
   geom_jitter() +
   xlim(0, 250) +
+  geom_smooth() +
   labs(title="Community Reviews", y="Average Rating", x="Review Count")
 ```
 
@@ -129,178 +141,39 @@ linear_reg() %>%
   tidy()
 ```
 
----
-Slighly better model
+- Average review score = 6.89 + 0.01*total reviews
+
+- Starting at 6.89, we would expect the rating to go up by 0.01 for each additional review.
 
 ---
-Conclusion
----
-#THIS IS THE END OF WHERE I"VE GOTTEN TO. THE REST IS WHAT WAS ALREADY IN THE FILE!!!
+#Keep this in mind
+##Model for between 5 and 50 reviews
 
+```{r filtered_pizza, include=FALSE, echo = FALSE}
+fifty_pizza <- pizza %>%
+  filter(review_stats_community_count >= 5 & review_stats_community_count <= 50)
+```
 
----
+```{r echo=FALSE}
+linear_reg() %>%
+  set_engine("glm") %>%
+  fit(review_stats_community_average_score ~ review_stats_community_count, data = fifty_pizza) %>%
+  tidy()
+```
 
+- Average review score = 6.73 + 0.03*total reviews
 
-
-
-class: center, middle
-
-## A statement of the overall goal / research question
-
----
-
-class: inverse, center, middle
-
-# Section title
-
----
-
-# Hello World
-
-- Click the `Knit` button to compile your presentation
-
-- Make sure to commit and push all resulting files to your GitHub repo
+- Starting at 6.73, we would expect the rating to go up by 0.03 for each additional review.
 
 ---
+#Conclusion
 
-class: inverse, middle, center
 
-# Using xaringan
+- New York isn't necessarily better.
 
----
+- Mid-range prices are ideal (especially for college students).
 
-# xaringan
-
-- The presentation is created using the `xaringan` package
-
-- Use `---` to separate slides and `--` for incremental builds
-
+- More reviews is generally good.
 --
 
-- Like this
-
----
-
-# Layouts
-
-You can use plain text
-
-- or bullet points
-
-.pull-left[
-or text in two columns $^*$
-]
-.pull-right[
-- like
-- this
-]
-
-.footnote[
-[*] And add footnotes
-]
-
----
-
-# Code
-
-```{r boring-regression}
-# a boring regression
-model <- lm(dist ~ speed, data = cars)
-tidy(model)
-glance(model)
-```
-
----
-
-# Plots
-
-```{r recode-species, echo = FALSE}
-# In this chunk I'm doing a bunch of analysis that I don't want to present 
-# in my slides. But I need the resulting data frame for a plot I want to present.
-iris_modified <- iris %>%
-  mutate(Species = fct_other(Species, keep = "setosa"))
-```
-
-```{r plot-iris, echo = FALSE}
-# Code hidden with echo = FALSE
-# Uses modified iris dataset from previous chunk
-# Play around with height and width until you're happy with the look
-ggplot(data = iris_modified, mapping = aes(x = Sepal.Width, y = Sepal.Length, color = Species)) +
-  geom_point() + 
-  theme_minimal() # theme options: https://ggplot2.tidyverse.org/reference/ggtheme.html
-```
-
----
-
-## Plot and text
-
-.pull-left[
-- Some text
-- goes here
-]
-.pull-right[
-```{r warning=FALSE, out.width="100%", fig.width=4, echo=FALSE}
-# see how I changed out.width and fig.width from defaults
-# to make the figure bigger
-ggplot(penguins, aes(x = bill_length_mm, y = species, color = species)) +
-  geom_boxplot() +
-  theme_minimal()
-```
-]
-
----
-
-# Tables
-
-If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
-
-```{r iris-table, echo = FALSE}
-kable(head(iris), format = "html")
-```
-
----
-
-# Images
-
-```{r castle, echo = FALSE, out.width = "60%", fig.align = "center", fig.cap = "Image credit: Photo by Jörg Angeli on Unsplash."}
-include_graphics("https://images.unsplash.com/photo-1535448033526-c0e85c9e6968?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80")
-```
-
-Or you can also include a full page image. See next slide.
-
----
-
-background-image: url(https://images.unsplash.com/photo-1535448033526-c0e85c9e6968?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80)
-
----
-
-# Math Expressions
-
-You can write LaTeX math expressions inside a pair of dollar signs, e.g. &#36;\alpha+\beta$ renders $\alpha+\beta$. You can use the display style with double dollar signs:
-
-```
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-```
-
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-
-Limitations:
-
-1. The source code of a LaTeX math expression must be in one line, unless it is inside a pair of double dollar signs, in which case the starting `$$` must appear in the very beginning of a line, followed immediately by a non-space character, and the ending `$$` must be at the end of a line, led by a non-space character;
-
-1. There should not be spaces after the opening `$` or before the closing `$`.
-
-1. Math does not work on the title slide (see [#61](https://github.com/yihui/xaringan/issues/61) for a workaround).
-
----
-
-# Feeling adventurous?
-
-- Want to find out more about `xaringan`? See https://slides.yihui.name/xaringan/#1.
-
-- You are welcomed to use the default styling of the slides. In fact, that's what I expect majority of you will do. You will differentiate yourself with the content of your presentation.
-
-- But some of you might want to play around with slide styling. The 
-`xaringanthemer` provides some solutions for this that: https://pkg.garrickadenbuie.com/xaringanthemer.
-
-- And if you want more bells and whistles, there is also `xaringanExtra`: https://pkg.garrickadenbuie.com/xaringanExtra.
+- Critics are essentially useless.
