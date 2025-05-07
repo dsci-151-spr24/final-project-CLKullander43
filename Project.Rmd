@@ -76,7 +76,7 @@ pizza %>%
   count(review_stats_community_count)
 ```
 
-
+## Continued analysis
 
 **Now I want to analyze the difference in ratings depending on whether a restaurant is in New York or not.**
 
@@ -89,10 +89,17 @@ pizza <- pizza %>%
 ggplot(data=pizza, mapping=aes(x = review_stats_all_average_score, fill = nyc)) +
   geom_histogram() +
   facet_wrap(nyc~.) +
-  labs(y="Average Community Rating", x="Price rating")
+  labs(x="Average Community Rating")
 ```
 
 **The two are still quite similar aside from NYC having larger spikes and more observations in total.**
+
+```{r}
+pizza %>%
+  group_by(nyc) %>%
+  summarise(med_rating =median(review_stats_community_average_score), mean_rating =mean(review_stats_community_average_score))
+```
+
 
 
 
@@ -125,7 +132,6 @@ I want to now do the same visualisation and model, but this time filter out the 
 ```{r filtered_pizza}
 filtered_pizza <- pizza %>%
   filter(review_stats_community_count >= 5)
-
 ```
 
 
@@ -184,6 +190,11 @@ ggplot(data=many_pizza, mapping=aes(y = review_stats_community_average_score, x 
   labs(y="Average Community Rating", x="Price Level")
 ```
 
-Nope, none of these go above 2. This means that we want a restaurant with a price level of 2, and a large number of reviews. 
+Nope, none of these go above 2, and having a price level of 2 has better ratings, on average. This means that we want a restaurant with a price level of 2, and a large number of reviews. 
+
+
+
+
+
 
 
