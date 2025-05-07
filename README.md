@@ -22,7 +22,7 @@ While thinking about the number of reviews, I took a look at how review count af
 
 Next, after creating a quick model for this, I saw that starting at 6.89, we can expect the average rating to go up by 0.01 for every review it has. Really, all this data tells us is that we are more likely to find good pizza by going to restaurants with a high number of reviews. This model isn’t super useful, as we already know that a high review count is good.
 
-So, lets make another model. This one only for when the number of observations is between 5 and 50. This new model shows that starting at 6.73, we can expect review score to go up by 0.03. This one is more useful, because we know what we want our cutoff point to be, this will give us a general idea of how many reviews it will take to get there.
+So, I made another model, this one only for when the number of observations is between 5 and 50. This new model shows that starting at 6.73, we can expect review score to go up by 0.03. This one is more useful, because we know what we want our cutoff point to be, this will give us a general idea of how many reviews it will take to get there.
 In the end, we can say that to consistently find the best pizza, look for a restaurant with mid-range pricing and a lot of reviews. 
 
 ## Presentation
@@ -31,12 +31,10 @@ My presentation can be found [here](presentation/presentation.html).
 
 ## Data
 
-Include a citation for your data here. See
-<http://libraryguides.vu.edu.au/c.php?g=386501&p=4347840> for guidance
-on proper citation for datasets. If you got your data off the web, make
-sure to note the retrieval date.
+I pulled the dataset from a Tidytuesday repository, which credits the data to Tyler Richards.
+Data Retrieved on 3/15/2025.
+https://github.com/rfordatascience/tidytuesday/tree/main/data/2019/2019-10-01
 
 ## References
-
-List any references here. You should, at a minimum, list your data
-source.
+Dataset:
+https://github.com/rfordatascience/tidytuesday/tree/main/data/2019/2019-10-01
